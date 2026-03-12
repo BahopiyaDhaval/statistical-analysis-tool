@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Statistical Tool</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(120deg,#667eea,#764ba2);
+text-align:center;
+padding:40px;
+}
+
+.container{
+background:white;
+padding:30px;
+width:800px;
+margin:auto;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📊 Statistical Analysis Tool</h2>
+
+<form method="POST">
+
+<input type="text" name="numbers" placeholder="10,20,30,40" required>
+
+<br><br>
+
+<button type="submit">Analyze</button>
+
+</form>
+
+{% if result %}
+
+<h3>Results</h3>
+
+<table border="1" align="center">
+
+<tr><td>Mean</td><td>{{result.mean}}</td></tr>
+<tr><td>Median</td><td>{{result.median}}</td></tr>
+<tr><td>Range</td><td>{{result.range}}</td></tr>
+<tr><td>Outliers</td><td>{{result.outliers}}</td></tr>
+
+</table>
+
+<br>
+
+<h3>Select Graph</h3>
+
+<select id="graphType">
+<option value="bar">Bar</option>
+<option value="line">Line</option>
+<option value="pie">Pie</option>
+</select>
+
+<button onclick="drawGraph()">Show Graph</button>
+
+<br><br>
+
+<form action="/download_pdf" method="POST">
+
+<input type="hidden" name="graphType" id="hiddenGraph">
+
+<button type="submit" onclick="setGraph()">Download PDF</button>
+
+</form>
+
+<br>
+
+<canvas id="myChart"></canvas>
+
+<script>
+
+let data={{data|tojson}}
+
+let freq={}
+
+for(let i of data){
+freq[i]=(freq[i]||0)+1
+}
+
+let labels=Object.keys(freq)
+let values=Object.values(freq)
+
+let chart
+
+function drawGraph(){
+
+let type=document.getElementById("graphType").value
+
+const ctx=document.getElementById("myChart").getContext("2d")
+
+if(chart){chart.destroy()}
+
+chart=new Chart(ctx,{
+
+type:type,
+
+data:{
+labels:labels,
+datasets:[{
+label:"Frequency",
+data:values,
+backgroundColor:["#667eea","#764ba2","#6dd5ed","#f6d365","#ff9a9e"]
+}]
+}
+
+})
+
+}
+
+function setGraph(){
+document.getElementById("hiddenGraph").value=document.getElementById("graphType").value
+}
+
+</script>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>
